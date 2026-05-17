@@ -2,11 +2,19 @@ const targetDate = new Date('November 19, 2026 00:00:00').getTime();
 
 export default async (req, context) => {
     try {
+        // Берем текущее время на сервере
         const now = new Date();
         
-        // Считаем разницу в днях (округляем в большую сторону)
-        const difference = targetDate - now.getTime();
-        const daysLeft = Math.ceil(difference / (1000 * 60 * 60 * 24));
+        // Сдвигаем время сервера на +2 часа, чтобы получить точное время в Калининграде
+        const kaliningradTime = new Date(now.getTime() + (2 * 60 * 60 * 1000));
+        
+        // Сбрасываем часы, минуты и секунды, чтобы сравнивать только чистые календарные дни
+        const todayClean = new Date(kaliningradTime.getFullYear(), kaliningradTime.getMonth(), kaliningradTime.getDate()).getTime();
+        const targetClean = new Date(2026, 10, 19).getTime(); // 10 — это ноябрь в JS (счет с 0)
+
+        // Считаем чистую разницу в днях
+        const difference = targetClean - todayClean;
+        const daysLeft = Math.round(difference / (1000 * 60 * 60 * 24));
 
         let text = '';
         if (daysLeft > 0) {
@@ -20,7 +28,6 @@ export default async (req, context) => {
         const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
         const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
-        // Отправляем запрос в Telegram API
         const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -45,7 +52,7 @@ export default async (req, context) => {
     }
 };
 
-// Настройка расписания (каждый день в 00:00 по Москве / 21:00 UTC)
+// Настройка расписания (каждый день в 00:00 по Калининграду / 22:00 UTC)
 export const config = {
     schedule: "0 22 * * *"
 };
