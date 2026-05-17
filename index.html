@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>GTA VI</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="GTA VI Таймер">
+
+    <style>
+        /* Убираем стандартные отступы браузера и растягиваем на весь экран */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            /* ДОБАВЛЕНО: фикс белой полосы внизу для iPhone */
+            min-height: 100vh;
+            min-height: 100dvh; /* Динамическая высота для iOS */
+            background-color: #0f131c; /* Заливаем подложку темным цветом градиента */
+        }
+
+        body {
+            /* Создаем линейный градиент сверху вниз */
+            /* Цвета подобраны пипеткой с вашего изображения:
+               #1b2131 - верхний темно-сине-серый оттенок
+               #0f131c - нижний, более темный оттенок */
+            background: linear-gradient(180deg, #1b2131 0%, #0f131c 100%);
+            
+            /* Фиксируем фон, чтобы при появлении контента и прокрутке он не ломался */
+            background-attachment: fixed;
+
+            /* Ниже добавлены новые стили, не изменяя предыдущие */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+            padding: 60px 24px;
+            overflow: hidden;
+            /* Отключаем выделение текста, чтобы сайт ощущался как нативное приложение */
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        /* Контейнер для центрирования надписи и таймера */
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+        }
+
+        .title {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 24px;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #ff7b00 0%, #ff3c00 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 4px 30px rgba(255, 60, 0, 0.2);
+        }
+
+        /* Эффект матового стекла (Глассморфизм) для таймера */
+        .timer-container {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 24px 16px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            box-sizing: border-box;
+        }
+
+        .timer-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .timer-value {
+            font-size: 32px;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .timer-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: #94a3b8;
+            margin-top: 6px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* Блок с кнопками внизу экрана */
+        .buttons-container {
+            width: 100%;
+            max-width: 380px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-sizing: border-box;
+            /* Учет безопасной зоны для нижнего статус-бара на iPhone без кнопок */
+            margin-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 18px 24px;
+            border-radius: 18px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            box-sizing: border-box;
+            transition: transform 0.1s ease, opacity 0.2s ease;
+        }
+
+        /* Стили для первой кнопки */
+        .btn-site-creator {
+            background: linear-gradient(135deg, #ff6b00 0%, #e64a19 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 20px rgba(230, 74, 25, 0.3);
+        }
+
+        /* Стили для второй кнопки */
+        .btn-gta-creator {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Эффект нажатия (тап) для мобильных устройств */
+        .btn:active {
+            transform: scale(0.96);
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <div class="title">До GTA VI осталось:</div>
+        
+        <div class="timer-container">
+            <div class="timer-item">
+                <div class="timer-value" id="days">00</div>
+                <div class="timer-label">Дней</div>
+            </div>
+            <div class="timer-item">
+                <div class="timer-value" id="hours">00</div>
+                <div class="timer-label">Часов</div>
+            </div>
+            <div class="timer-item">
+                <div class="timer-value" id="minutes">00</div>
+                <div class="timer-label">Минут</div>
+            </div>
+            <div class="timer-item">
+                <div class="timer-value" id="seconds">00</div>
+                <div class="timer-label">Секунд</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="buttons-container">
+        <a href="https://t.me/ABCDEFGHlJKLMNOPQRSTUV" target="_blank" rel="noopener noreferrer" class="btn btn-site-creator">Креатор сайта</a>
+        <a href="https://t.me/llIlllIIlllII" target="_blank" rel="noopener noreferrer" class="btn btn-gta-creator">Креатор GTA VI</a>
+    </div>
+
+    <script>
+        const targetDate = new Date('November 19, 2026 00:00:00').getTime();
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const difference = targetDate - now;
+
+            if (difference < 0) {
+                document.getElementById('days').innerText = '00';
+                document.getElementById('hours').innerText = '00';
+                document.getElementById('minutes').innerText = '00';
+                document.getElementById('seconds').innerText = '00';
+                return;
+            }
+
+            const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+            document.getElementById('days').innerText = days < 10 ? '0' + days : days;
+            document.getElementById('hours').innerText = hours < 10 ? '0' + hours : hours;
+            document.getElementById('minutes').innerText = minutes < 10 ? '0' + minutes : minutes;
+            document.getElementById('seconds').innerText = seconds < 10 ? '0' + seconds : seconds;
+        }
+
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+    </script>
+
+</body>
+</html>
