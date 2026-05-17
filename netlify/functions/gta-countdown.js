@@ -47,5 +47,5 @@ export default async (req, context) => {
 
 // Настройка расписания (каждый день в 00:00 по Москве / 21:00 UTC)
 export const config = {
-    schedule: "0 21 * * *"
+    schedule: "0 22 * * *"
 };
